@@ -1,14 +1,15 @@
-# Interactive Quad Trees
+# Quad Tree Playground
 
-An interactive visual introduction to quad trees by Kshitij Mishra.
+A synchronized spatial and tree visualization of quad trees by Kshitij Mishra.
 
 Students can:
 
 - Click or drag to add points.
 - Watch regions subdivide as they reach capacity.
+- See the corresponding four-child tree update alongside the spatial view.
 - Change node capacity.
-- Add random points or run the animated scatter.
-- Read the accompanying explanation and TypeScript pseudocode.
+- Add random points in bulk.
+- Pan and zoom the tree representation.
 
 ## Run locally
 

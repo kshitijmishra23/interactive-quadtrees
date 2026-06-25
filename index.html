@@ -3,78 +3,386 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#faf9f6">
-  <title>Quad Trees | Kshitij Mishra</title>
-  <meta name="description" content="An interactive introduction to quad trees and spatial partitioning.">
+  <meta name="theme-color" content="#f7f8fc">
+  <title>Quad Tree Playground | Kshitij Mishra</title>
   <style>
-    :root { --paper:#faf9f6;--ink:#24231f;--muted:#77736b;--line:#d8d4cb;--soft:#efede7;--accent:#d95d39;--code:#252722 }
-    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:var(--paper);font-family:Georgia,"Times New Roman",serif;font-size:19px;line-height:1.75;-webkit-font-smoothing:antialiased}
-    a{color:inherit;text-decoration-color:#aaa59b;text-underline-offset:4px}a:hover{color:var(--accent);text-decoration-color:var(--accent)}
-    .site-header{width:min(1120px,calc(100% - 40px));margin:0 auto;height:104px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-    .brand{font-weight:700;letter-spacing:.02em;text-decoration:none}.brand-mark{color:var(--accent)}nav{display:flex;align-items:center;gap:26px}nav a{text-decoration:none;color:var(--muted)}nav a.active{color:var(--ink)}
-    .article{width:min(720px,calc(100% - 40px));margin:92px auto 120px}.kicker{margin:0 0 18px;color:var(--accent);font:700 12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase}
-    h1{max-width:680px;margin:0;font-size:clamp(42px,7vw,72px);line-height:1.03;letter-spacing:0;font-weight:500}.dek{margin:28px 0 20px;max-width:620px;color:#555149;font-size:22px;line-height:1.55}
-    .meta{display:flex;align-items:center;gap:10px;color:var(--muted);font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.meta i{width:3px;height:3px;border-radius:50%;background:#a5a096}.hero-rule{margin:52px 0 64px;border:0;border-top:1px solid var(--line)}
-    p{margin:0 0 1.45em}.lead::first-letter{float:left;padding:10px 10px 0 0;color:var(--accent);font-size:76px;line-height:.68}h2{margin:2.2em 0 .75em;font-size:34px;line-height:1.2;font-weight:500}h3{margin:2em 0 .6em;font-size:24px;line-height:1.3;font-weight:600}
-    code{padding:.12em .32em;border-radius:3px;background:var(--soft);font:.82em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}pre{overflow-x:auto;margin:32px calc((min(920px,100vw - 40px) - 100%)/-2);padding:28px 32px;border-radius:6px;color:#e8e8df;background:var(--code);font:14px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}pre code{padding:0;background:transparent;font:inherit}.kw{color:#e88e69}.ty{color:#a6c993}
-    .figure{width:min(920px,calc(100vw - 40px));margin:48px 50%;transform:translateX(-50%)}.demo-shell{border:1px solid #c9c5bb;border-radius:6px;background:#fdfcf9;overflow:hidden}.demo-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:58px;padding:10px 14px 10px 18px;border-bottom:1px solid var(--line);font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-    .demo-title{display:flex;align-items:center;gap:9px;font-weight:700}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px #f3dcd4}.controls{display:flex;align-items:center;gap:7px}button{appearance:none;border:1px solid #c7c2b8;border-radius:4px;padding:7px 10px;color:var(--ink);background:#fff;cursor:pointer;font:inherit}button:hover{border-color:var(--ink)}button.primary{border-color:var(--ink);color:#fff;background:var(--ink)}
-    .capacity{display:flex;align-items:center;gap:7px;color:var(--muted)}select{border:1px solid #c7c2b8;border-radius:4px;padding:6px 26px 6px 8px;color:var(--ink);background:#fff;font:inherit}.canvas-wrap{position:relative;aspect-ratio:16/9;min-height:320px}canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}.canvas-hint{position:absolute;right:12px;bottom:10px;pointer-events:none;color:#89847a;font:11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-    figcaption{margin-top:12px;color:var(--muted);text-align:center;font-size:14px;font-style:italic}blockquote{margin:36px 0;padding:3px 0 3px 24px;border-left:3px solid var(--accent);color:#4f4b44;font-size:22px;font-style:italic}
-    .tree-diagram{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;padding:32px;border:1px solid var(--line);border-radius:6px;background:#fdfcf9}.quad-box{position:relative;aspect-ratio:1;border:2px solid var(--ink)}.quad-box::before,.quad-box::after{content:"";position:absolute;background:var(--ink)}.quad-box::before{top:0;bottom:0;left:50%;width:1px}.quad-box::after{left:0;right:0;top:50%;height:1px}
-    .quad-label{position:absolute;z-index:1;color:var(--muted);font:11px ui-monospace,monospace}.nw{top:10px;left:12px}.ne{top:10px;right:12px}.sw{bottom:10px;left:12px}.se{right:12px;bottom:10px}.tree{font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);white-space:pre}.tree b{color:var(--accent)}
-    .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:60px;padding-top:26px;border-top:1px solid var(--line)}.tag{padding:5px 9px;border:1px solid var(--line);border-radius:3px;color:var(--muted);font:11px ui-monospace,monospace}.article-footer{width:min(1120px,calc(100% - 40px));margin:0 auto;padding:36px 0 44px;border-top:1px solid var(--line);color:var(--muted);font:12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;display:flex;justify-content:space-between}
-    @media(max-width:700px){body{font-size:17px}.site-header{height:78px}nav{gap:15px}nav a:nth-child(2){display:none}.article{margin-top:58px}h1{font-size:45px}.dek{font-size:19px}.demo-bar{align-items:flex-start;flex-direction:column}.controls{width:100%;flex-wrap:wrap}.controls button{flex:1}.canvas-wrap{min-height:360px;aspect-ratio:4/5}.tree-diagram{grid-template-columns:1fr}pre{padding:22px 20px}.article-footer{gap:20px;flex-direction:column}}
+    :root {
+      --bg: #f7f8fc;
+      --panel: #ffffff;
+      --ink: #171822;
+      --muted: #686b78;
+      --border: #d9dce7;
+      --grid: #aeb4c3;
+      --purple: #4b35d1;
+      --purple-soft: #eeeaff;
+      --pink: #f22d8b;
+      --pink-soft: #ffe7f2;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+    button, input, select { font: inherit; }
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 14px;
+      height: 100%;
+      padding: 14px;
+    }
+    .toolbar, .panel {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      min-height: 76px;
+      padding: 14px 18px;
+    }
+    .brand { margin-right: auto; }
+    .brand strong { display: block; font-size: 17px; letter-spacing: -.01em; }
+    .brand span { color: var(--muted); font-size: 12px; }
+    .field { display: flex; align-items: center; gap: 8px; }
+    .field label {
+      color: var(--muted);
+      font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    input, select {
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--ink);
+      background: #fff;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-soft); }
+    input { width: 76px; padding: 0 11px; }
+    select { min-width: 70px; padding: 0 28px 0 11px; }
+    button {
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0 15px;
+      color: var(--ink);
+      background: #fff;
+      cursor: pointer;
+      font-weight: 650;
+    }
+    button:hover { border-color: #aeb2c0; background: #fafaff; }
+    button.primary { border-color: var(--purple); color: #fff; background: var(--purple); }
+    button.primary:hover { background: #3d29bb; }
+    .workspace { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; min-height: 0; }
+    .panel { display: grid; grid-template-rows: 52px 1fr; min-width: 0; min-height: 0; overflow: hidden; }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-head h2 { margin: 0; font-size: 14px; letter-spacing: -.01em; }
+    .panel-meta { color: var(--muted); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .stage { position: relative; min-height: 0; overflow: hidden; }
+    canvas, svg { display: block; width: 100%; height: 100%; }
+    #space { cursor: crosshair; touch-action: none; }
+    #tree { cursor: grab; touch-action: none; }
+    #tree:active { cursor: grabbing; }
+    .hint {
+      position: absolute;
+      right: 12px;
+      bottom: 10px;
+      padding: 5px 8px;
+      border-radius: 4px;
+      color: var(--muted);
+      background: rgba(255,255,255,.88);
+      pointer-events: none;
+      font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .legend { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 11px; }
+    .legend span { display: flex; align-items: center; gap: 5px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot.internal { background: var(--purple); }
+    .dot.leaf { background: var(--pink); }
+    .empty {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      gap: 4px;
+      text-align: center;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .empty strong { color: #444755; font-size: 14px; }
+    .empty span { font-size: 12px; }
+    @media (max-width: 820px) {
+      body { overflow: auto; }
+      .app { height: auto; min-height: 100%; }
+      .toolbar { align-items: flex-start; flex-wrap: wrap; }
+      .brand { width: 100%; }
+      .field { flex: 1; min-width: 130px; }
+      .field input, .field select { flex: 1; }
+      .workspace { grid-template-columns: 1fr; }
+      .panel { height: 520px; }
+    }
   </style>
 </head>
 <body>
-  <header class="site-header"><a class="brand" href="/"><span class="brand-mark">~/</span>kshitij</a><nav aria-label="Main navigation"><a href="#about">about</a><a class="active" href="#writing">writing</a></nav></header>
-  <main class="article"><article>
-    <header id="writing"><p class="kicker">Data structures / Visualized</p><h1>Introduction to Quad Trees</h1><p class="dek">A visual guide to dividing two-dimensional space, and why doing less work often begins with drawing a few more boxes.</p><div class="meta"><span>BY KSHITIJ MISHRA</span><i></i><span>9 MIN READ</span></div></header>
-    <hr class="hero-rule">
-    <p class="lead">Imagine a two-dimensional game with hundreds of objects moving at once. To detect a collision, the straightforward approach compares every object with every other object. It works, but the amount of work grows very quickly.</p>
-    <p>A quad tree gives us a better question: instead of asking which objects might collide everywhere, can we first narrow the search to a small region of space?</p>
-    <h2>Divide and locate</h2><p>A quad tree recursively partitions a rectangular area into four quadrants. Each node represents a region. Once that region contains more objects than its capacity allows, it splits into north-west, north-east, south-west, and south-east children.</p>
-    <figure class="figure"><div class="tree-diagram"><div class="quad-box" aria-label="A square divided into four quadrants"><span class="quad-label nw">NW</span><span class="quad-label ne">NE</span><span class="quad-label sw">SW</span><span class="quad-label se">SE</span></div><div class="tree"><b>root</b>
- |-- north-west
- |-- north-east
- |-- south-west
- `-- south-east</div></div><figcaption>The spatial partition on the left maps directly to the tree on the right.</figcaption></figure>
-    <p>Now try it. Every click inserts a point. When a region exceeds its capacity, it divides. Dense areas develop fine-grained partitions while empty areas remain untouched.</p>
-    <figure class="figure"><div class="demo-shell"><div class="demo-bar"><div class="demo-title"><span class="live-dot"></span>QUAD TREE PLAYGROUND</div><div class="controls"><label class="capacity">capacity <select id="capacity" aria-label="Node capacity"><option>1</option><option selected>4</option><option>8</option></select></label><button id="random" type="button">+ 25 random</button><button id="clear" type="button">clear</button><button class="primary" id="animate" type="button">scatter</button></div></div><div class="canvas-wrap"><canvas id="quadtree" aria-label="Interactive quadtree visualization"></canvas><span class="canvas-hint">click or drag to add points</span></div></div><figcaption id="stats">0 points, 1 region</figcaption></figure>
-    <blockquote>The structure adapts to the data. More detail appears only where more detail is useful.</blockquote>
-    <h2>The shape of a node</h2><p>Each node needs only a boundary, a capacity, the points it currently owns, and references to four children after subdivision.</p>
-    <pre><code><span class="kw">class</span> <span class="ty">QuadTree</span> {
-  boundary: Rectangle
-  capacity: number
-  points: Point[]
-  children?: QuadTree[]
+  <main class="app">
+    <section class="toolbar" aria-label="Playground controls">
+      <div class="brand"><strong>Quad Tree Playground</strong><span>by Kshitij Mishra</span></div>
+      <div class="field"><label for="capacity">Capacity</label><select id="capacity"><option>1</option><option>2</option><option selected>4</option><option>8</option></select></div>
+      <div class="field"><label for="randomCount">Random points</label><input id="randomCount" type="number" min="1" max="500" value="50"></div>
+      <button class="primary" id="addRandom" type="button">Add random</button>
+      <button id="clear" type="button">Clear</button>
+    </section>
 
-  insert(point: Point): boolean
-  subdivide(): void
-  query(range: Rectangle): Point[]
-}</code></pre>
-    <h3>Insertion</h3><p>Insertion first checks whether the point belongs inside the current boundary. If the node has room, it stores the point. Otherwise it subdivides and hands the point to the appropriate child.</p>
-    <pre><code>insert(point) {
-  <span class="kw">if</span> (!this.boundary.contains(point)) <span class="kw">return false</span>
-  <span class="kw">if</span> (this.points.length &lt; this.capacity) {
-    this.points.push(point)
-    <span class="kw">return true</span>
-  }
-  <span class="kw">if</span> (!this.children) this.subdivide()
-  <span class="kw">return</span> this.children.some(child =&gt; child.insert(point))
-}</code></pre>
-    <h2>Why it helps</h2><p>For a range query, we can ignore every node whose boundary does not intersect the requested area. A well-distributed tree turns a broad scan into a short walk through only the relevant branches.</p><p>That idea shows up in collision detection, maps, image compression, particle simulations, and nearest-neighbour search. Different applications tune the stopping rule, but the recursive structure remains pleasantly small.</p>
-    <div class="tags"><span class="tag">algorithms</span><span class="tag">data-structures</span><span class="tag">typescript</span><span class="tag">visualization</span></div>
-  </article></main>
-  <footer class="article-footer" id="about"><span>Kshitij Mishra</span><span>Built with curiosity and plain JavaScript.</span></footer>
+    <section class="workspace">
+      <article class="panel">
+        <header class="panel-head"><h2>Spatial partition</h2><span class="panel-meta" id="spaceMeta">0 points · 1 region</span></header>
+        <div class="stage"><canvas id="space" aria-label="Interactive quad tree spatial partition"></canvas><span class="hint">Click or drag to add points</span></div>
+      </article>
+      <article class="panel">
+        <header class="panel-head"><h2>Tree representation</h2><div class="legend"><span><i class="dot internal"></i>internal</span><span><i class="dot leaf"></i>leaf</span></div></header>
+        <div class="stage" id="treeStage">
+          <svg id="tree" aria-label="Quad tree node representation"></svg>
+          <div class="empty" id="empty"><strong>The root is empty</strong><span>Add points to grow the tree</span></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
   <script>
-    const canvas=document.querySelector("#quadtree"),ctx=canvas.getContext("2d"),stats=document.querySelector("#stats"),capacitySelect=document.querySelector("#capacity");let points=[],regions=[],scatterTimer=null;
-    function split(x,y,w,h,items,depth,capacity){regions.push({x,y,w,h,depth});if(items.length<=capacity||depth>=8||w<8||h<8)return;const hw=w/2,hh=h/2,b=[[],[],[],[]];for(const p of items){const east=p.x>=x+hw?1:0,south=p.y>=y+hh?2:0;b[east+south].push(p)}split(x,y,hw,hh,b[0],depth+1,capacity);split(x+hw,y,hw,hh,b[1],depth+1,capacity);split(x,y+hh,hw,hh,b[2],depth+1,capacity);split(x+hw,y+hh,hw,hh,b[3],depth+1,capacity)}
-    function resize(){const rect=canvas.getBoundingClientRect(),ratio=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(rect.width*ratio);canvas.height=Math.round(rect.height*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);draw()}
-    function draw(){const w=canvas.clientWidth,h=canvas.clientHeight;regions=[];split(0,0,w,h,points,0,Number(capacitySelect.value));ctx.clearRect(0,0,w,h);ctx.fillStyle="#fdfcf9";ctx.fillRect(0,0,w,h);for(const r of regions){if(!r.depth)continue;ctx.strokeStyle=r.depth<3?"rgba(36,35,31,.48)":"rgba(36,35,31,.24)";ctx.lineWidth=r.depth<2?1.2:.8;ctx.strokeRect(r.x+.5,r.y+.5,r.w-1,r.h-1)}for(const p of points){ctx.beginPath();ctx.arc(p.x,p.y,3.3,0,Math.PI*2);ctx.fillStyle="#d95d39";ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,7,0,Math.PI*2);ctx.strokeStyle="rgba(217,93,57,.18)";ctx.stroke()}stats.textContent=points.length+(points.length===1?" point, ":" points, ")+regions.length+(regions.length===1?" region":" regions")}
-    function addAt(e){const r=canvas.getBoundingClientRect();points.push({x:e.clientX-r.left,y:e.clientY-r.top});draw()}let dragging=false;canvas.addEventListener("pointerdown",e=>{dragging=true;canvas.setPointerCapture(e.pointerId);addAt(e)});canvas.addEventListener("pointermove",e=>{if(!dragging)return;const last=points[points.length-1],r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;if(!last||Math.hypot(last.x-x,last.y-y)>12){points.push({x,y});draw()}});canvas.addEventListener("pointerup",()=>dragging=false);canvas.addEventListener("pointercancel",()=>dragging=false);
-    document.querySelector("#random").addEventListener("click",()=>{for(let i=0;i<25;i++)points.push({x:12+Math.random()*(canvas.clientWidth-24),y:12+Math.random()*(canvas.clientHeight-24)});draw()});document.querySelector("#clear").addEventListener("click",()=>{clearInterval(scatterTimer);scatterTimer=null;points=[];draw();document.querySelector("#animate").textContent="scatter"});document.querySelector("#animate").addEventListener("click",e=>{if(scatterTimer){clearInterval(scatterTimer);scatterTimer=null;e.currentTarget.textContent="scatter";return}e.currentTarget.textContent="pause";scatterTimer=setInterval(()=>{if(points.length>=180){clearInterval(scatterTimer);scatterTimer=null;e.currentTarget.textContent="scatter";return}points.push({x:12+Math.random()*(canvas.clientWidth-24),y:12+Math.random()*(canvas.clientHeight-24)});draw()},90)});capacitySelect.addEventListener("change",draw);new ResizeObserver(resize).observe(canvas);resize();
+    const NS = "http://www.w3.org/2000/svg";
+    const canvas = document.querySelector("#space");
+    const ctx = canvas.getContext("2d");
+    const svg = document.querySelector("#tree");
+    const treeStage = document.querySelector("#treeStage");
+    const capacityInput = document.querySelector("#capacity");
+    const randomCountInput = document.querySelector("#randomCount");
+    const meta = document.querySelector("#spaceMeta");
+    const empty = document.querySelector("#empty");
+    let points = [];
+    let root = null;
+    let hoveredId = null;
+    let dragging = false;
+    let view = { x: 0, y: 0, scale: 1 };
+    let pan = null;
+    let nextId = 0;
+
+    class Node {
+      constructor(x, y, w, h, depth = 0) {
+        this.id = nextId++;
+        this.x = x; this.y = y; this.w = w; this.h = h; this.depth = depth;
+        this.points = []; this.children = null; this.count = 0;
+      }
+      contains(p) { return p.x >= this.x && p.x < this.x + this.w && p.y >= this.y && p.y < this.y + this.h; }
+      subdivide() {
+        const hw = this.w / 2, hh = this.h / 2, d = this.depth + 1;
+        this.children = [
+          new Node(this.x, this.y, hw, hh, d),
+          new Node(this.x + hw, this.y, hw, hh, d),
+          new Node(this.x, this.y + hh, hw, hh, d),
+          new Node(this.x + hw, this.y + hh, hw, hh, d)
+        ];
+      }
+      insert(p, capacity) {
+        if (!this.contains(p)) return false;
+        this.count++;
+        if (!this.children && (this.points.length < capacity || this.depth >= 9 || this.w < 4 || this.h < 4)) {
+          this.points.push(p); return true;
+        }
+        if (!this.children) {
+          this.subdivide();
+          const old = this.points.splice(0);
+          for (const item of old) this.children.some(child => child.insert(item, capacity));
+        }
+        return this.children.some(child => child.insert(p, capacity));
+      }
+    }
+
+    function rebuild() {
+      nextId = 0;
+      root = new Node(0, 0, canvas.clientWidth, canvas.clientHeight);
+      const capacity = Number(capacityInput.value);
+      for (const point of points) root.insert(point, capacity);
+      drawSpace();
+      drawTree();
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const oldW = root ? root.w : rect.width;
+      const oldH = root ? root.h : rect.height;
+      if (points.length && oldW && oldH) {
+        points = points.map(p => ({ x: p.x / oldW * rect.width, y: p.y / oldH * rect.height }));
+      }
+      const ratio = Math.min(devicePixelRatio || 1, 2);
+      canvas.width = Math.round(rect.width * ratio);
+      canvas.height = Math.round(rect.height * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      rebuild();
+    }
+
+    function collectNodes(node, out = []) {
+      out.push(node);
+      if (node.children) node.children.forEach(child => collectNodes(child, out));
+      return out;
+    }
+
+    function drawSpace() {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, w, h);
+      const nodes = collectNodes(root);
+      for (const node of nodes) {
+        if (node.depth === 0) continue;
+        ctx.strokeStyle = node.id === hoveredId ? "#4b35d1" : "#aeb4c3";
+        ctx.lineWidth = node.id === hoveredId ? 2 : 1;
+        ctx.strokeRect(node.x + .5, node.y + .5, node.w - 1, node.h - 1);
+        if (node.id === hoveredId) {
+          ctx.fillStyle = "rgba(75,53,209,.08)";
+          ctx.fillRect(node.x, node.y, node.w, node.h);
+        }
+      }
+      for (const p of points) {
+        ctx.beginPath(); ctx.arc(p.x, p.y, 3.6, 0, Math.PI * 2);
+        ctx.fillStyle = "#4b35d1"; ctx.fill();
+      }
+      meta.textContent = points.length + (points.length === 1 ? " point · " : " points · ") + nodes.length + (nodes.length === 1 ? " region" : " regions");
+    }
+
+    function treeMetrics(node) {
+      if (!node.children) return { leaves: 1, depth: node.depth };
+      const children = node.children.map(treeMetrics);
+      return { leaves: children.reduce((sum, m) => sum + m.leaves, 0), depth: Math.max(...children.map(m => m.depth)) };
+    }
+
+    function layoutTree(node) {
+      let leafCursor = 0;
+      const positions = new Map();
+      function visit(current) {
+        if (!current.children) {
+          const x = leafCursor++;
+          positions.set(current.id, { x, y: current.depth });
+          return x;
+        }
+        const childX = current.children.map(visit);
+        const x = childX.reduce((a, b) => a + b, 0) / childX.length;
+        positions.set(current.id, { x, y: current.depth });
+        return x;
+      }
+      visit(node);
+      return { positions, leafCount: Math.max(leafCursor, 1) };
+    }
+
+    function svgEl(name, attrs = {}) {
+      const el = document.createElementNS(NS, name);
+      Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+      return el;
+    }
+
+    function drawTree() {
+      svg.replaceChildren();
+      empty.hidden = points.length > 0;
+      if (!root) return;
+      const nodes = collectNodes(root);
+      const metrics = treeMetrics(root);
+      const layout = layoutTree(root);
+      const pad = 44;
+      const xGap = Math.max(18, Math.min(56, (treeStage.clientWidth - pad * 2) / Math.max(layout.leafCount - 1, 1)));
+      const yGap = Math.max(58, Math.min(80, (treeStage.clientHeight - pad * 2) / Math.max(metrics.depth, 1)));
+      const contentW = Math.max((layout.leafCount - 1) * xGap + pad * 2, treeStage.clientWidth - 20);
+      const contentH = Math.max((metrics.depth + 1) * yGap + pad * 2, treeStage.clientHeight - 20);
+      svg.setAttribute("viewBox", "0 0 " + treeStage.clientWidth + " " + treeStage.clientHeight);
+      const group = svgEl("g", { transform: "translate(" + view.x + " " + view.y + ") scale(" + view.scale + ")" });
+      const offsetX = Math.max(pad, (contentW - (layout.leafCount - 1) * xGap) / 2);
+      const pos = id => {
+        const p = layout.positions.get(id);
+        return { x: offsetX + p.x * xGap, y: pad + p.y * yGap };
+      };
+      for (const node of nodes) {
+        if (!node.children) continue;
+        const a = pos(node.id);
+        for (const child of node.children) {
+          const b = pos(child.id);
+          group.appendChild(svgEl("line", { x1:a.x, y1:a.y, x2:b.x, y2:b.y, stroke:"#c5c8d2", "stroke-width":"1.2" }));
+        }
+      }
+      for (const node of nodes) {
+        const p = pos(node.id);
+        const g = svgEl("g", { transform:"translate(" + p.x + " " + p.y + ")", tabindex:"0", role:"button", "aria-label":(node.children ? "Internal" : "Leaf") + " node with " + node.count + " points" });
+        g.style.cursor = "pointer";
+        const active = node.id === hoveredId;
+        if (active) g.appendChild(svgEl("circle", { r:"22", fill:node.children ? "#eeeaff" : "#ffe7f2" }));
+        g.appendChild(svgEl("circle", { r:"15", fill:node.children ? "#4b35d1" : "#f22d8b" }));
+        const text = svgEl("text", { x:"0", y:"1", fill:"#fff", "font-size":"10", "font-weight":"700", "text-anchor":"middle", "dominant-baseline":"middle" });
+        text.textContent = node.count;
+        g.appendChild(text);
+        g.addEventListener("mouseenter", () => { hoveredId = node.id; drawSpace(); drawTree(); });
+        g.addEventListener("mouseleave", () => { hoveredId = null; drawSpace(); drawTree(); });
+        group.appendChild(g);
+      }
+      svg.appendChild(group);
+      const boundsW = Math.max(contentW * view.scale, treeStage.clientWidth);
+      const boundsH = Math.max(contentH * view.scale, treeStage.clientHeight);
+      svg.dataset.bounds = boundsW + "," + boundsH;
+    }
+
+    function addPointFromEvent(event) {
+      const rect = canvas.getBoundingClientRect();
+      points.push({ x: Math.max(0, Math.min(rect.width - .01, event.clientX - rect.left)), y: Math.max(0, Math.min(rect.height - .01, event.clientY - rect.top)) });
+      rebuild();
+    }
+    canvas.addEventListener("pointerdown", event => { dragging = true; canvas.setPointerCapture(event.pointerId); addPointFromEvent(event); });
+    canvas.addEventListener("pointermove", event => {
+      if (!dragging) return;
+      const rect = canvas.getBoundingClientRect();
+      const last = points[points.length - 1];
+      const x = event.clientX - rect.left, y = event.clientY - rect.top;
+      if (!last || Math.hypot(last.x - x, last.y - y) > 12) addPointFromEvent(event);
+    });
+    canvas.addEventListener("pointerup", () => dragging = false);
+    canvas.addEventListener("pointercancel", () => dragging = false);
+
+    document.querySelector("#addRandom").addEventListener("click", () => {
+      const amount = Math.max(1, Math.min(500, Number(randomCountInput.value) || 1));
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      for (let i = 0; i < amount; i++) points.push({ x: 8 + Math.random() * Math.max(1, w - 16), y: 8 + Math.random() * Math.max(1, h - 16) });
+      rebuild();
+    });
+    document.querySelector("#clear").addEventListener("click", () => { points = []; hoveredId = null; view = { x:0, y:0, scale:1 }; rebuild(); });
+    capacityInput.addEventListener("change", rebuild);
+
+    svg.addEventListener("wheel", event => {
+      event.preventDefault();
+      const rect = svg.getBoundingClientRect();
+      const mx = event.clientX - rect.left, my = event.clientY - rect.top;
+      const old = view.scale;
+      view.scale = Math.max(.35, Math.min(2.5, view.scale * (event.deltaY < 0 ? 1.12 : .89)));
+      view.x = mx - (mx - view.x) * (view.scale / old);
+      view.y = my - (my - view.y) * (view.scale / old);
+      drawTree();
+    }, { passive:false });
+    svg.addEventListener("pointerdown", event => { pan = { x:event.clientX, y:event.clientY, vx:view.x, vy:view.y }; svg.setPointerCapture(event.pointerId); });
+    svg.addEventListener("pointermove", event => { if (!pan) return; view.x = pan.vx + event.clientX - pan.x; view.y = pan.vy + event.clientY - pan.y; drawTree(); });
+    svg.addEventListener("pointerup", () => pan = null);
+    svg.addEventListener("pointercancel", () => pan = null);
+
+    new ResizeObserver(resizeCanvas).observe(canvas);
+    new ResizeObserver(drawTree).observe(treeStage);
   </script>
 </body>
 </html>
